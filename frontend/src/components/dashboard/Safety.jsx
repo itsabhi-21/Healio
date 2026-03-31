@@ -61,8 +61,8 @@ export default function Safety({ dashboardData }) {
           <span className="text-sm font-medium text-blue-900">Emergency Contacts</span>
         </div>
         <div className="text-sm text-blue-800">
-          <p>Emergency Services: <span className="font-medium">911</span></p>
-          <p>Poison Control: <span className="font-medium">1-800-222-1222</span></p>
+          <p>Emergency Services: <span className="font-medium">102/108</span></p>
+          <p>Poison Control: <span className="font-medium">1800-425-1213</span></p>
         </div>
       </div>
 

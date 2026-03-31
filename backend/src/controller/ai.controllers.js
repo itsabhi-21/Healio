@@ -4,7 +4,7 @@ const SymptomSession = require('../../models/SymptomSession');
 const analyzeUserSymptoms = async (req, res) => {
     try {
         const { symptoms, selectedSymptoms, duration, severity, location } = req.body;
-        const userId = req.userId || null;
+        const userId = req.userId;
 
         // 🔹 Validate input
         if (!symptoms && (!selectedSymptoms || selectedSymptoms.length === 0)) {
@@ -159,30 +159,52 @@ const submitFeedback = async (req, res) => {
 const getUserSymptomHistory = async (req, res) => {
     try {
         const userId = req.userId;
-        const { page = 1, limit = 10 } = req.query;
+        const { page = 1, limit = 10, severity, timeframe } = req.query;
 
         const query = { user: userId };
 
-        const sessions = await SymptomSession.find(query)
-            .sort({ createdAt: -1 })
-            .limit(Number(limit))
-            .skip((page - 1) * limit)
-            .select('symptoms analysis status createdAt');
+        // Filter by severity
+        if (severity) {
+            query['symptoms.severity'] = severity;
+        }
 
-        const total = await SymptomSession.countDocuments(query);
+        // Filter by timeframe (days)
+        if (timeframe) {
+            const daysAgo = new Date();
+            daysAgo.setDate(daysAgo.getDate() - parseInt(timeframe));
+            query.createdAt = { $gte: daysAgo };
+        }
+
+        const pageNum = Number(page);
+        const limitNum = Number(limit);
+        const skip = (pageNum - 1) * limitNum;
+
+        const [sessions, total] = await Promise.all([
+            SymptomSession.find(query)
+                .sort({ createdAt: -1 })
+                .limit(limitNum)
+                .skip(skip)
+                .select('symptoms analysis status createdAt'),
+            SymptomSession.countDocuments(query)
+        ]);
+
+        const totalPages = Math.ceil(total / limitNum);
 
         res.json({
             sessions: sessions.map(session => ({
                 id: session._id,
                 symptoms: session.symptoms.selectedSymptoms,
+                severity: session.symptoms.severity,
                 possibleConditions: session.analysis.possibleConditions,
                 status: session.status,
                 date: session.createdAt
             })),
             pagination: {
-                currentPage: Number(page),
-                totalPages: Math.ceil(total / limit),
-                totalSessions: total
+                currentPage: pageNum,
+                totalPages,
+                totalSessions: total,
+                hasNext: pageNum < totalPages,
+                hasPrev: pageNum > 1
             }
         });
     } catch (error) {

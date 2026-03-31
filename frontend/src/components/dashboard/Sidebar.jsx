@@ -37,9 +37,9 @@ export default function Sidebar() {
     <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center gap-2 ml-1">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center mb-4 mt-3">
-            <img src={logo} alt="Healio Logo" className="w-6 h-6 object-contain" />
+        <div className="flex items-center ml-1 justify-center">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-4 mt-3">
+            <img src={logo} alt="Healio Logo" className="object-contain" />
           </div>
           <span className="text-2xl font-bold text-gray-900 mb-4 mt-3">Healio</span>
         </div>

@@ -210,27 +210,25 @@ export default function History() {
                   <div key={entry.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-start gap-4">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          entry.isUrgent ? 'bg-red-100' : 'bg-blue-100'
-                        }`}>
-                          <svg className={`w-5 h-5 ${
-                            entry.isUrgent ? 'text-red-600' : 'text-blue-600'
-                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-100">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                           </svg>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">{entry.condition}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {entry.possibleConditions?.[0] || 'Analysis completed'}
+                            </h3>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(entry.severity)}`}>
                               {getSeverityLabel(entry.severity)}
                             </span>
-                            {entry.isUrgent && (
-                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-                                URGENT
-                              </span>
-                            )}
                           </div>
+                          {entry.possibleConditions?.length > 1 && (
+                            <p className="text-sm text-gray-500 mb-2">
+                              +{entry.possibleConditions.length - 1} more possible condition{entry.possibleConditions.length > 2 ? 's' : ''}
+                            </p>
+                          )}
                           <div className="flex flex-wrap gap-2 mb-3">
                             {entry.symptoms.slice(0, 5).map((symptom, index) => (
                               <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-sm">
@@ -249,12 +247,6 @@ export default function History() {
                           </div>
                         </div>
                       </div>
-                      <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1">
-                        View Details
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -311,7 +303,7 @@ export default function History() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Urgent Cases</span>
                   <span className="font-medium text-red-600">
-                    {historyEntries.filter(entry => entry.isUrgent).length}
+                    {historyEntries.filter(entry => entry.severity?.toLowerCase() === 'severe').length}
                   </span>
                 </div>
               </div>

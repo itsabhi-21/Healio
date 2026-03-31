@@ -13,11 +13,12 @@ import Contact from "./pages/Contact";
 import SymptomsAnalyse from "./pages/SymptomsAnalyse";
 import HowitWorks from "./pages/HowitWorks";
 import Signup from "./pages/Signup";
+import AuthCallback from "./pages/AuthCallback";
 import { useLocation } from "react-router-dom";
 
 function Layout(){
   const location = useLocation();
-  const hideNavbarRoutes = ["/login", "/signup", "/dashboard", "/dashboard/history", "/dashboard/tracker", "/dashboard/profile", "/dashboard/symptom-checker"];
+  const hideNavbarRoutes = ["/login", "/signup", "/auth/callback", "/dashboard", "/dashboard/history", "/dashboard/tracker", "/dashboard/profile", "/dashboard/symptom-checker", "/symptomsanalyse"];
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
   
   return (
@@ -32,7 +33,7 @@ function Layout(){
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/how-it-works" element={<HowitWorks />} />
-        <Route path="/symptomsanalyse" element={<SymptomsAnalyse />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={
@@ -53,6 +54,11 @@ function Layout(){
         <Route path="/dashboard/symptom-checker" element={
           <ProtectedRoute>
             <SymptomChecker />
+          </ProtectedRoute>
+        } />
+        <Route path="/symptomsanalyse" element={
+          <ProtectedRoute>
+            <SymptomsAnalyse />
           </ProtectedRoute>
         } />
       </Routes>

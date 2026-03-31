@@ -7,10 +7,9 @@ export default function Navbar() {
     <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
 
-        {/* Left: Logo */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <img src={logo} alt="Healio Logo" className="w-6 h-6 object-contain" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+            <img src={logo} alt="Healio Logo" className="size-max object-contain" />
           </div>
           <span className="text-xl font-bold text-blue-600">Healio</span>
         </div>

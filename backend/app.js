@@ -1,16 +1,22 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+const User = require('./models/Users');
 const aiRoutes = require('./src/routes/ai.routes');
 const authRoutes = require('./src/routes/auth.routes');
 const dashboardRoutes = require('./src/routes/dashboard.routes');
 
 const app = express();
 
-// Middleware
+// ─── Core Middleware ──────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration
 app.use(cors({
     origin: [
         'http://localhost:5173',
@@ -18,7 +24,6 @@ app.use(cors({
         'http://localhost:3000',
         'http://127.0.0.1:5173',
         'http://127.0.0.1:5174',
-        'http://127.0.0.1:3000'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -26,38 +31,105 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 
-// Request logging middleware
+// ─── Session & Passport (must be before routes) ───────────────────────────────
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'healio_session_secret',
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// ─── Google OAuth Strategy ────────────────────────────────────────────────────
+passport.use(new GoogleStrategy(
+    {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL
+    },
+    async (accessToken, refreshToken, profile, done) => {
+        try {
+            const email = profile.emails?.[0]?.value;
+            if (!email) return done(new Error('No email from Google'), null);
+
+            // Find or create user
+            let user = await User.findOne({ email });
+            if (!user) {
+                user = new User({
+                    firstName: profile.name?.givenName || 'User',
+                    lastName: profile.name?.familyName || '',
+                    email,
+                    password: `google_oauth_${profile.id}`, // placeholder, not used for login
+                    isEmailVerified: true
+                });
+                await user.save();
+            }
+
+            return done(null, user);
+        } catch (err) {
+            return done(err, null);
+        }
+    }
+));
+
+passport.serializeUser((user, done) => done(null, user._id));
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id).select('-password');
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
+});
+
+// ─── Request Logging ──────────────────────────────────────────────────────────
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     next();
 });
 
-// Routes
+// ─── Google OAuth Routes ──────────────────────────────────────────────────────
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL}/login` }),
+    (req, res) => {
+        // Issue a JWT so the frontend can use the same token-based auth flow
+        const token = jwt.sign(
+            { userId: req.user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        // Redirect to frontend with token — frontend reads it from URL and stores it
+        const redirectPath = req.session.loginRedirect || '/dashboard';
+        delete req.session.loginRedirect;
+        res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}&redirect=${encodeURIComponent(redirectPath)}`);
+    }
+);
+
+// ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/ai', aiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// Health check endpoint
+// ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
-        timestamp: new Date().toISOString(),
-        version: '1.0.0'
-    });
+    res.json({ status: 'OK', timestamp: new Date().toISOString(), version: '1.0.0' });
 });
 
-// 404 handler
+// ─── 404 ──────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
-    res.status(404).json({ 
-        error: 'Route not found',
-        path: req.originalUrl 
-    });
+    res.status(404).json({ error: 'Route not found', path: req.originalUrl });
 });
 
-// Global error handler
+// ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use((error, req, res, next) => {
     console.error('Global error handler:', error);
-    res.status(500).json({ 
+    res.status(500).json({
         error: 'Internal server error',
         message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
     });
