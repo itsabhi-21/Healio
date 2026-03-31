@@ -48,7 +48,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight requests
+// app.options('*', cors(corsOptions)); // Handle preflight requests
 
 // ─── Session & Passport (must be before routes) ───────────────────────────────
 app.use(session({
