@@ -46,7 +46,7 @@ passport.use(new GoogleStrategy(
     {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL
+        callbackURL: `${process.env.FRONTEND_URL}/api/auth/google/callback` || process.env.GOOGLE_CALLBACK_URL
     },
     async (accessToken, refreshToken, profile, done) => {
         try {
@@ -88,28 +88,6 @@ app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     next();
 });
-
-// ─── Google OAuth Routes ──────────────────────────────────────────────────────
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-);
-
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL}/login` }),
-    (req, res) => {
-        // Issue a JWT so the frontend can use the same token-based auth flow
-        const token = jwt.sign(
-            { userId: req.user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        // Redirect to frontend with token — frontend reads it from URL and stores it
-        const redirectPath = req.session.loginRedirect || '/dashboard';
-        delete req.session.loginRedirect;
-        res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}&redirect=${encodeURIComponent(redirectPath)}`);
-    }
-);
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/ai', aiRoutes);
