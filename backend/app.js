@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
     origin: [
-        process.env.FRONTEND_URL || 'http://localhost:5173',
+        process.env.FRONTEND_URL || 'https://healio-qx1r6wzzg-abhinavch2105-gmailcoms-projects.vercel.app/',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
