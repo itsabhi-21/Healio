@@ -17,15 +17,38 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({
-    origin: [
-        process.env.FRONTEND_URL || 'https://healio-qx1r6wzzg-abhinavch2105-gmailcoms-projects.vercel.app/',
-    ],
+// ─── CORS Configuration ───────────────────────────────────────────────────────
+const corsOptions = {
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'https://healio-b3rnsvvza-abhinavch2105-gmailcoms-projects.vercel.app',
+            process.env.FRONTEND_URL?.replace(/\/$/, ''),
+            'http://localhost:5173',
+            'http://localhost:3000'
+        ].filter(Boolean);
+
+        if (!origin) return callback(null, true);
+
+        if (origin.includes('vercel.app')) {
+            return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        console.warn(`CORS blocked: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+    },
+
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     optionsSuccessStatus: 200
-}));
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests
 
 // ─── Session & Passport (must be before routes) ───────────────────────────────
 app.use(session({
