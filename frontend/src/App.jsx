@@ -13,7 +13,7 @@ import Contact from "./pages/Contact";
 import SymptomsAnalyse from "./pages/SymptomsAnalyse";
 import HowitWorks from "./pages/HowitWorks";
 import Signup from "./pages/Signup";
-import AuthCallback from "./pages/AuthCallback";
+import AuthCallback from "./components/auth/AuthCallback";
 import { useLocation } from "react-router-dom";
 
 function Layout(){
