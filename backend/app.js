@@ -22,7 +22,7 @@ app.use(cors({
     ],
     credentials: true
 }));
-app.options('*', cors()); // Allow preflight requests for all routes
+// app.options('*', cors()); // Allow preflight requests for all routes
 
 // ─── Basic setup ──────────────────────────────────────────────────────────────
 app.use(express.json());
