@@ -13,7 +13,6 @@ import Contact from "./pages/Contact";
 import SymptomsAnalyse from "./pages/SymptomsAnalyse";
 import HowitWorks from "./pages/HowitWorks";
 import Signup from "./pages/Signup";
-import GoogleCallback from "./pages/GoogleCallback.jsx";
 import { useLocation } from "react-router-dom";
 import GoogleCallback from "./pages/GoogleCallback.jsx";
 
