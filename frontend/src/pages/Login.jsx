@@ -108,7 +108,7 @@ export default function Login() {
     setIsGoogleLoading(true);
     // Store intended destination so Google callback can redirect correctly
     sessionStorage.setItem("login_redirect", from);
-    window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL;
+    window.location.href = import.meta.env.GOOGLE_AUTH_URL;
   };
 
   const isDisabled = isLoading || isGoogleLoading;
