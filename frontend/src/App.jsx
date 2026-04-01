@@ -13,8 +13,9 @@ import Contact from "./pages/Contact";
 import SymptomsAnalyse from "./pages/SymptomsAnalyse";
 import HowitWorks from "./pages/HowitWorks";
 import Signup from "./pages/Signup";
-import AuthCallback from "./components/auth/AuthCallback";
+import GoogleCallback from "./pages/GoogleCallback.jsx";
 import { useLocation } from "react-router-dom";
+import GoogleCallback from "./pages/GoogleCallback.jsx";
 
 function Layout(){
   const location = useLocation();
@@ -33,7 +34,7 @@ function Layout(){
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/how-it-works" element={<HowitWorks />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/callback" element={<GoogleCallback />} />
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={
