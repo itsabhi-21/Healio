@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     clearError,
-    isAuthenticated: authService.isAuthenticated()
+    isAuthenticated: !!user || authService.isAuthenticated()  // ✅ Reactive - updates when user changes
   };
 
   return (
