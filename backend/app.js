@@ -52,6 +52,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'healio_session_secret',
     resave: false,
     saveUninitialized: false,
+    proxy:true,
     cookie: {
         httpOnly: true,
         secure: true,           // HTTPS only (required for SameSite=None)

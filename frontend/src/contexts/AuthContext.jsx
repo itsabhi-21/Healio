@@ -116,6 +116,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser,
     loading,
     error,
     login,
@@ -123,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     clearError,
-    isAuthenticated: !!user
+    isAuthenticated: authService.isAuthenticated()
   };
 
   return (

@@ -1,44 +1,52 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import apiService from "../services/api";
+import authService from "../services/auth";
 
 export default function GoogleCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    const redirect = searchParams.get("redirect") || "/dashboard";
-    console.log("Token received:", token);
-    if (!token) {
-      setError("Authentication failed. No token received.");
-      setLoading(false);
-      return;
-    }
+    const handleCallback = async () => {
+      try {
+        const token = searchParams.get("token");
+        const redirect = searchParams.get("redirect") || "/dashboard";
 
-    try {
-      // Store token in localStorage
-      localStorage.setItem("token", token);
+        if (!token) {
+          setError("Authentication failed. No token received.");
+          setLoading(false);
+          return;
+        }
 
-      // Decode token to get user info
-      const decoded = JSON.parse(atob(token.split(".")[1]));
+        console.log("✅ Token received from backend");
 
-      // Store in context if needed
-      if (setUser) {
-        setUser({ id: decoded.userId });
+        // Store token with correct key used throughout the app
+        apiService.setAuthToken(token);
+        console.log("✅ Token stored in localStorage");
+
+        // Fetch user profile from backend
+        const profileResponse = await authService.getProfile();
+        console.log("✅ User profile fetched:", profileResponse.user);
+
+        // Store full user data
+        authService.setCurrentUser(profileResponse.user);
+        console.log("✅ User data stored");
+
+        // Redirect to intended destination
+        console.log("✅ Redirecting to:", redirect);
+        navigate(redirect, { replace: true });
+      } catch (err) {
+        console.error("❌ Error in Google callback:", err);
+        setError(err.message || "Failed to process authentication");
+        setLoading(false);
       }
+    };
 
-      // Redirect to intended destination
-      navigate(redirect, { replace: true });
-    } catch (err) {
-      console.error("Error processing callback:", err);
-      setError("Failed to process authentication. Please try again.");
-      setLoading(false);
-    }
-  }, [searchParams, navigate, setUser]);
+    handleCallback();
+  }, [searchParams, navigate]);
 
   if (loading) {
     return (
@@ -53,12 +61,13 @@ export default function GoogleCallback() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="text-center">
+      <div className="text-center max-w-md w-full mx-4">
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
+          <p className="text-red-700 font-semibold mb-2">Authentication Failed</p>
+          <p className="text-red-600 text-sm mb-4">{error}</p>
           <button
             onClick={() => navigate("/login")}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             Back to Login
           </button>
