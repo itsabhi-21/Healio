@@ -12,7 +12,7 @@ export default function GoogleCallback() {
   useEffect(() => {
     const token = searchParams.get("token");
     const redirect = searchParams.get("redirect") || "/dashboard";
-
+    console.log("Token received:", token);
     if (!token) {
       setError("Authentication failed. No token received.");
       setLoading(false);

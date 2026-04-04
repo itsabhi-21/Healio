@@ -42,6 +42,7 @@ class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
       headers: this.getHeaders(options.auth !== false),
+      credentials: 'include',  // CRITICAL: Send cookies with cross-site requests
       ...options,
     };
 

@@ -13,16 +13,35 @@ const dashboardRoutes = require('./src/routes/dashboard.routes');
 
 const app = express();
 
-// ─── Allow frontend to talk to backend ───────────────────────────────────────
-app.use(cors({
-    origin: [
-        'https://healio-wheat.vercel.app',
-        'http://localhost:5173',
-        'http://localhost:3000'
-    ],
-    credentials: true
-}));
-// app.options('*', cors()); // Allow preflight requests for all routes
+// ─── Trust Proxy (REQUIRED on Render) ──────────────────────────────────────────
+app.set('trust proxy', 1);
+
+// ─── CORS Configuration ───────────────────────────────────────────────────────
+const corsOptions = {
+    origin: function(origin, callback) {
+        const allowedOrigins = [
+            'https://healio-wheat.vercel.app',
+            'https://healio-qx1r6wzzg-abhinavch2105-gmailcoms-projects.vercel.app',
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+            'http://127.0.0.1:3000'
+        ];
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`🚫 CORS blocked origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 // ─── Basic setup ──────────────────────────────────────────────────────────────
 app.use(express.json());
@@ -32,7 +51,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'healio_session_secret',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: true,           // HTTPS only (required for SameSite=None)
+        sameSite: 'none',       // Allow cross-site cookies
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
+    }
 }));
 
 app.use(passport.initialize());
