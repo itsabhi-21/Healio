@@ -1,4 +1,18 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+
 export default function HowCTA() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSymptomCheck = () => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      navigate('/symptomsanalyse');
+    }
+  };
+
   return (
     <section className="bg-linear-to-br from-blue-50 to-white w-full py-24 border-t">
       <div className="max-w-5xl mx-auto px-6 text-center">
@@ -11,7 +25,7 @@ export default function HowCTA() {
           It takes less than 2 minutes to get clear educational insights about your health.
         </p>
 
-        <button className="mt-10 px-8 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition">
+        <button onClick={handleSymptomCheck} className="mt-10 px-8 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition">
           Start Symptom Checker
         </button>
 

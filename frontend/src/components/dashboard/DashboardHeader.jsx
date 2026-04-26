@@ -21,6 +21,7 @@ export default function DashboardHeader({ title, subtitle, userName, showNewChec
   }, []);
 
   const handleLogout = () => {
+    setDropdownOpen(false);
     logout();
     navigate('/');
   };

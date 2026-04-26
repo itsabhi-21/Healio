@@ -1,9 +1,21 @@
 import React from 'react';
 import DashboardPreview from './DashboardPreview';
 import SymptomsAnalyse from '../../pages/SymptomsAnalyse';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function HeroSection() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSymptomCheckClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login');
+    } else {
+      navigate('/symptomsanalyse');
+    }
+  };
   return (
     <div className="max-w-7xl mx-auto px-6 pt-16 pb-20">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -45,9 +57,9 @@ export default function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/symptomsanalyse" 
-            className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
-              Start Symptom Check</Link>
+            <button onClick={handleSymptomCheckClick}
+            className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer border-none">
+              Start Symptom Check</button>
             
             <Link className="bg-white text-gray-700 px-8 py-4 rounded-full font-semibold hover:bg-gray-50 transition-colors duration-200 border border-gray-200"
             to="/about">

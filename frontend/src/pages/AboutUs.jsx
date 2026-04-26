@@ -1,6 +1,24 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Footer from '../components/common/Footer';
 
 export default function About() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSymptomChecker = () => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      navigate('/symptomsanalyse');
+    }
+  };
+
+  const handleContact = () => {
+    navigate('/contact');
+  };
+
   return (
     <div className="w-full">
 
@@ -17,10 +35,10 @@ export default function About() {
               Healio is an AI-powered health assistant built to help people understand their symptoms, make informed decisions, and take better control of their health — anytime, anywhere.
             </p>
             <div className="mt-8 flex gap-4">
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition">
+              <button onClick={handleSymptomChecker} className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition">
                 Try Symptom Checker
               </button>
-              <button className="px-6 py-3 border border-gray-300 rounded-full font-medium hover:bg-gray-100 transition">
+              <button onClick={handleContact} className="px-6 py-3 border border-gray-300 rounded-full font-medium hover:bg-gray-100 transition">
                 Contact Us
               </button>
             </div>
@@ -153,7 +171,7 @@ export default function About() {
             Start your symptom check today and get AI-powered insights in minutes.
           </p>
 
-          <button className="mt-8 px-8 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-100 transition">
+          <button onClick={handleSymptomChecker} className="mt-8 px-8 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-100 transition">
             Start Symptom Check →
           </button>
         </div>

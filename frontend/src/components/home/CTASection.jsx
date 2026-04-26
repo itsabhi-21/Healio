@@ -1,7 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function CTASection() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSymptomCheckClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      navigate('/login');
+    } else {
+      navigate('/symptomsanalyse');
+    }
+  };
   return (
     <div className="bg-gray-50 py-20">
       <div className="max-w-4xl mx-auto px-6 text-center">
@@ -12,11 +24,11 @@ export default function CTASection() {
           Start your symptom check today and get AI-powered insights in minutes. It's free, private, and available 24/7.
         </p>
         
-        <Link className="bg-blue-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center gap-3 mx-auto mb-6"
-        to="/symptomsanalyse"
+        <button onClick={handleSymptomCheckClick}
+        className="bg-blue-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center gap-3 mx-auto mb-6 cursor-pointer border-none"
         >
           Start Your Symptom Check
-        </Link>
+        </button>
         
         <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

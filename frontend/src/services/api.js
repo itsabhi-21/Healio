@@ -54,10 +54,11 @@ class ApiService {
         // Handle authentication errors
         if (response.status === 401) {
           this.removeAuthToken();
-          window.location.href = '/login';
-          throw new Error(data.error || 'Authentication failed');
+          // Don't hard redirect on 401 - let the app handle navigation
+          // ProtectedRoute will redirect to login if needed
+          throw new Error('Session expired. Please login again.');
         }
-        
+
         throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
 

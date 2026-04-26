@@ -84,10 +84,14 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
+    // Clear user first to prevent any ongoing API calls
+    setUser(null);
+    setLoading(false);
+    setError(null);
+
+    // Then clear auth tokens
     authService.logout();
     authService.clearCurrentUser();
-    setUser(null);
-    setError(null);
   };
 
   // Update profile function
