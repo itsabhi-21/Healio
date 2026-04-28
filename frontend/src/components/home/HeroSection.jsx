@@ -12,8 +12,6 @@ export default function HeroSection() {
     if (!user) {
       e.preventDefault();
       navigate('/login');
-    } else {
-      navigate('/symptomsanalyse');
     }
   };
   return (
